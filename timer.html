@@ -3,192 +3,517 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مؤقتات المهام التصاعدية</title>
+    <title>تعقب العادات الرقمي | Habit Tracker</title>
     <style>
         :root {
-            --bg-color: #121214;
-            --card-bg: #1a1a1e;
-            --accent-color: #4f46e5;
-            --accent-hover: #6366f1;
-            --text-color: #f3f4f6;
+            --bg-dark: #0f111a;
+            --bg-card: #161925;
+            --bg-sidebar: #121420;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f3f4f6;
             --text-muted: #9ca3af;
-            --danger-color: #ef4444;
+            --border: #26293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* زر فتح القائمة الجانبية */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-toggle:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        /* القائمة الجانبية */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            height: 100vh;
+            background-color: var(--bg-sidebar);
+            border-left: 1px solid var(--border);
+            z-index: 999;
+            transition: right 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
+            padding: 80px 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .sidebar-list {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .sidebar-item {
+            padding: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(99, 102, 241, 0.1) 100%);
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-right: 0;
+            transition: margin-right 0.4s ease;
+            width: 100%;
         }
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 750px;
+            margin-top: 40px;
         }
 
-        h1 {
+        header h1 {
             text-align: center;
-            color: #fff;
+            font-size: 2.2rem;
+            background: linear-gradient(to left, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 30px;
-            font-size: 2rem;
         }
 
-        .input-section {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        /* قسم الإدخال */
+        .input-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 14px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 30px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
         }
 
-        input[type="text"] {
+        .input-box input {
             flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #374151;
-            background-color: #111827;
-            color: #fff;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--accent-color);
-        }
-
-        button {
-            padding: 12px 24px;
-            border-radius: 8px;
-            border: none;
-            background-color: var(--accent-color);
+            background: #0b0c13;
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 10px;
             color: white;
             font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .input-box input:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 24px;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.2s;
         }
 
-        button:hover {
-            background-color: var(--accent-hover);
+        .btn-primary:hover {
+            background: var(--primary-hover);
         }
 
-        .timers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+        /* واجهة العداد النشط والتفاصيل */
+        .active-habit-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+            display: none;
         }
 
-        .timer-card {
-            background-color: var(--card-bg);
+        .habit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .habit-title {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* العداد الرئيسي المتصاعد */
+        .main-chrono {
+            font-family: monospace, sans-serif;
+            font-size: 2.5rem;
+            color: var(--success);
+            text-align: center;
+            background: #0b0c13;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-            border-top: 4px solid var(--accent-color);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
         }
 
-        .timer-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            word-break: break-word;
+        /* الإحصائيات والأزرار */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
-        .time-display {
-            font-family: monospace;
-            font-size: 1.4rem;
-            color: #34d399;
-            direction: ltr;
+        .stat-card {
+            background: #1e2235;
+            padding: 15px;
+            border-radius: 10px;
             text-align: center;
-            background: #111827;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            border: 1px solid var(--border);
         }
 
-        .timer-date {
+        .stat-label {
             font-size: 0.85rem;
             color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
-        .delete-btn {
-            background-color: transparent;
-            color: var(--danger-color);
-            border: 1px solid var(--danger-color);
-            padding: 6px 12px;
-            font-size: 0.9rem;
-            border-radius: 6px;
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
         }
 
-        .delete-btn:hover {
-            background-color: var(--danger-color);
+        .best-streak-value {
+            color: #fbbf24; /* لون ذهبي للمستند القياسي */
+            font-family: monospace, sans-serif;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn-reset {
+            flex: 2;
+            background: var(--danger);
             color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset:hover {
+            opacity: 0.9;
+        }
+
+        .btn-delete {
+            flex: 1;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 110, 0.1);
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* سجل المحاولات السابقة */
+        .history-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-list {
+            list-style: none;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-left: 5px;
+        }
+
+        .history-item {
+            background: #1a1d2e;
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-duration {
+            font-family: monospace;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .history-dates {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-align: left;
+        }
+
+        .no-data {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 60px;
+            font-size: 1.1rem;
+        }
+
+        /* تعديل الأرقام لتبدو بالصيغة اللاتينية دائماً */
+        .main-chrono, .stat-value, .history-duration, .history-dates, input {
+            font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>⏱️ نظام المؤقتات التصاعدية المستمرة</h1>
-    
-    <div class="input-section">
-        <input type="text" id="timerName" placeholder="اكتب اسم المؤقت الجديد هنا... (مثال: تحدي الالتزام)">
-        <button onclick="createNewTimer()">بدء المؤقت</button>
+    <!-- زر القائمة الجانبية -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰ قائمة العادات</button>
+
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="sidebar">
+        <h2>🎯 عاداتك الحالية</h2>
+        <ul class="sidebar-list" id="sidebarList"></ul>
     </div>
 
-    <div class="timers-grid" id="timersContainer"></div>
-</div>
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <header>
+                <h1>⏱️ نظام تتبع العادات والمؤقتات الرقمية</h1>
+            </header>
+
+            <!-- صندوق إضافة عادة جديدة -->
+            <div class="input-box">
+                <input type="text" id="habitInput" placeholder="اكتب مسمى التحدي/العادة (مثال: عدم لمس الهاتف)...">
+                <button class="btn-primary" onclick="createNewHabit()">بدء التحدي</button>
+            </div>
+
+            <!-- لوحة تحكم العادة النشطة المحددة -->
+            <div class="active-habit-panel" id="habitPanel">
+                <div class="habit-header">
+                    <div class="habit-title" id="currentHabitName">اسم العادة</div>
+                </div>
+
+                <!-- العداد التصاعدي المباشر -->
+                <div class="main-chrono" id="mainChronoDisplay">00d : 00h : 00m : 00s</div>
+
+                <!-- الإحصائيات السريعة -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">تاريخ الانطلاق الحالي</div>
+                        <div class="stat-value" id="currentStartDate">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">🏆 أطول مدة صمود (رقمك القياسي)</div>
+                        <div class="stat-value best-streak-value" id="bestStreakDisplay">0d : 00h : 00m : 00s</div>
+                    </div>
+                </div>
+
+                <!-- أزرار التحكم والريستارت -->
+                <div class="action-buttons">
+                    <button class="btn-reset" onclick="resetCurrentHabit()">❌ خسرت! (إعادة العداد من الصفر)</button>
+                    <button class="btn-delete" onclick="deleteCurrentHabit()">حذف العادة نهائياً</button>
+                </div>
+
+                <!-- سجل المحاولات المكسورة سابقاً -->
+                <div class="history-section">
+                    <h3>📜 سجل المحاولات السابقة لهذه العادة</h3>
+                    <ul class="history-list" id="historyList"></ul>
+                </div>
+            </div>
+
+            <div id="placeholderText" class="placeholder-text">👈 افتح قائمة العادات من الزاوية العلوية أو أضف تحدياً جديداً للبدء في التتبع!</div>
+        </div>
+    </div>
 
 <script>
-    // تحميل المؤقتات المحفوظة من الذاكرة المحلية عند فتح الصفحة
-    let timers = JSON.parse(localStorage.getItem('chronoTimers')) || [];
+    // الحفاظ على التوافق مع الكود القديم عبر استخدام نفس المفتاح في الـ localStorage
+    let habits = JSON.parse(localStorage.getItem('chronoTimers')) || [];
+    let activeHabitId = null;
 
-    function saveTimers() {
-        localStorage.setItem('chronoTimers', JSON.stringify(timers));
+    // تهيئة مخصصة لإنتاج الأرقام اللاتينية العادية دائماً وتجنب الأرقام الهندية
+    const dateOptions = {
+        locale: 'en-US', // يضمن بقاء الأرقام عادية 1, 2, 3
+        hour12: false,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    };
+
+    function formatCustomDate(timestamp) {
+        const date = new Date(timestamp);
+        // نستخدم التنسيق الدولي الثابت لضمان الأرقام اللاتينية
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const hr = String(date.getHours()).padStart(2, '0');
+        const min = String(date.getMinutes()).padStart(2, '0');
+        return `${y}/${m}/${d} - ${hr}:${min}`;
     }
 
-    function createNewTimer() {
-        const input = document.getElementById('timerName');
+    function saveToStorage() {
+        localStorage.setItem('chronoTimers', JSON.stringify(habits));
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    function createNewHabit() {
+        const input = document.getElementById('habitInput');
         const name = input.value.trim();
-        
-        if (name === '') {
-            alert('الرجاء إدخال اسم للمؤقت أولاً!');
+
+        if (!name) {
+            alert('الرجاء إدخال اسم العادة أولاً!');
             return;
         }
 
-        const newTimer = {
+        const newHabit = {
             id: Date.now(),
             name: name,
-            startTime: new Date().getTime() // يخزن لحظة البداية بالملي ثانية
+            startTime: Date.now(), // البداية الحالية
+            history: [],           // سجل المحاولات الفاشلة السابقة
+            bestStreak: 0          // أطول مدة صمود بالملي ثانية
         };
 
-        timers.push(newTimer);
-        saveTimers();
-        renderTimers();
+        // تحويل أي صيغة مؤقت قديمة مسبقاً للهيكل الجديد لتجنب الأخطاء
+        habits.push(newHabit);
+        saveToStorage();
+        renderSidebar();
+        selectHabit(newHabit.id);
         input.value = '';
     }
 
-    function deleteTimer(id) {
-        if(confirm('هل أنت متأكد من حذف هذا المؤقت؟')) {
-            timers = timers.filter(timer => timer.id !== id);
-            saveTimers();
-            renderTimers();
-        }
+    function renderSidebar() {
+        const list = document.getElementById('sidebarList');
+        list.innerHTML = '';
+
+        habits.forEach(habit => {
+            const item = document.createElement('li');
+            item.className = `sidebar-item ${habit.id === activeHabitId ? 'active' : ''}`;
+            item.innerText = habit.name;
+            item.onclick = () => {
+                selectHabit(habit.id);
+                toggleSidebar(); // إغلاق السايدبار تلقائياً عند الاختيار لتسهيل الرؤية
+            };
+            list.appendChild(item);
+        });
     }
 
-    function formatTime(ms) {
+    function selectHabit(id) {
+        activeHabitId = id;
+        renderSidebar();
+
+        const habit = habits.find(h => h.id === id);
+        if (!habit) return;
+
+        // تأمين الهيكل في حال وجود بيانات قديمة مخزنة مسبقاً بدون تاريخ وسجل
+        if (!habit.history) habit.history = [];
+        if (!habit.bestStreak) habit.bestStreak = 0;
+        if (!habit.startTime && habit.startTime !== 0) habit.startTime = habit.id; 
+
+        document.getElementById('placeholderText').style.display = 'none';
+        document.getElementById('habitPanel').style.display = 'block';
+        document.getElementById('currentHabitName').innerText = habit.name;
+        document.getElementById('currentStartDate').innerText = formatCustomDate(habit.startTime);
+
+        renderHistory(habit);
+        updateBestStreakDisplay(habit.bestStreak);
+        updateLiveChrono();
+    }
+
+    function parseMsToText(ms) {
+        if (ms <= 0 || isNaN(ms)) return "0d : 00h : 00m : 00s";
         let seconds = Math.floor(ms / 1000);
         let minutes = Math.floor(seconds / 60);
         let hours = Math.floor(minutes / 60);
@@ -198,61 +523,95 @@
         minutes %= 60;
         hours %= 24;
 
-        // إضافة صفر على اليسار إذا كان الرقم أقل من 10 لتناسق الشكل
-        const d = days;
-        const h = String(hours).padStart(2, '0');
-        const m = String(minutes).padStart(2, '0');
-        const s = String(seconds).padStart(2, '0');
-
-        return `${d}d : ${h}h : ${m}m : ${s}s`;
+        return `${days}d : ${String(hours).padStart(2, '0')}h : ${String(minutes).padStart(2, '0')}m : ${String(seconds).padStart(2, '0')}s`;
     }
 
-    function updateDisplays() {
-        const now = new Date().getTime();
-        timers.forEach(timer => {
-            const displayElement = document.getElementById(`display-${timer.id}`);
-            if (displayElement) {
-                const diff = now - timer.startTime;
-                displayElement.innerText = formatTime(diff);
+    function updateLiveChrono() {
+        if (!activeHabitId) return;
+        const habit = habits.find(h => h.id === activeHabitId);
+        if (!habit) return;
+
+        const now = Date.now();
+        const diff = now - habit.startTime;
+
+        document.getElementById('mainChronoDisplay').innerText = parseMsToText(diff);
+    }
+
+    function updateBestStreakDisplay(bestMs) {
+        document.getElementById('bestStreakDisplay').innerText = parseMsToText(bestMs);
+    }
+
+    function resetCurrentHabit() {
+        if (!activeHabitId) return;
+        const habitIndex = habits.findIndex(h => h.id === activeHabitId);
+        if (habitIndex === -1) return;
+
+        if (confirm('هل أنت متأكد أنك خسرت الرهان وتريد إعادة تصفير العداد الحالي؟ سيتم حفظ المدة الحالية في السجل.')) {
+            const habit = habits[habitIndex];
+            const now = Date.now();
+            const durationOfStreak = now - habit.startTime;
+
+            // تحديث الرقم القياسي (أطول مدة صمود) إذا تم كسر الرقم القديم
+            if (durationOfStreak > habit.bestStreak) {
+                habit.bestStreak = durationOfStreak;
             }
-        });
-    }
 
-    function renderTimers() {
-        const container = document.getElementById('timersContainer');
-        container.innerHTML = '';
-
-        timers.forEach(timer => {
-            const startDate = new Date(timer.startTime).toLocaleString('ar-EG', {
-                hour12: true,
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+            // إضافة المحاولة المكسورة إلى سجل التاريخ
+            habit.history.unshift({
+                start: habit.startTime,
+                end: now,
+                duration: durationOfStreak
             });
 
-            const card = document.createElement('div');
-            card.className = 'timer-card';
-            card.innerHTML = `
-                <div class="timer-title">${timer.name}</div>
-                <div class="time-display" id="display-${timer.id}">0d : 00h : 00m : 00s</div>
-                <div class="timer-date">بدأ في: ${startDate}</div>
-                <button class="delete-btn" onclick="deleteTimer(${timer.id})">حذف المؤقت</button>
-            `;
-            container.appendChild(card);
-        });
-        
-        // تحديث فوري للأرقام بعد الرندرة
-        updateDisplays();
+            // إعادة تعيين وقت البدء الجديد من الصفر (الآن)
+            habit.startTime = now;
+
+            habits[habitIndex] = habit;
+            saveToStorage();
+            selectHabit(activeHabitId);
+        }
     }
 
-    // تحديث العدادات كل ثانية واحدة
-    setInterval(updateDisplays, 1000);
+    function deleteCurrentHabit() {
+        if (!activeHabitId) return;
+        if (confirm('هل أنت متأكد تماماً من حذف هذه العادة وكل سجلاتها نهائياً؟')) {
+            habits = habits.filter(h => h.id !== activeHabitId);
+            saveToStorage();
+            activeHabitId = null;
+            document.getElementById('habitPanel').style.display = 'none';
+            document.getElementById('placeholderText').style.display = 'block';
+            renderSidebar();
+        }
+    }
 
-    // تشغيل النظام عند فتح الصفحة لأول مرة
-    renderTimers();
+    function renderHistory(habit) {
+        const list = document.getElementById('historyList');
+        list.innerHTML = '';
+
+        if (!habit.history || habit.history.length === 0) {
+            list.innerHTML = '<li class="no-data">لا توجد محاولات سابقة مسجلة بعد. استمر في الصمود!</li>';
+            return;
+        }
+
+        habit.history.forEach(log => {
+            const item = document.createElement('li');
+            item.className = 'history-item';
+            
+            item.innerHTML = `
+                <div class="history-duration">${parseMsToText(log.duration)}</div>
+                <div class="history-dates">
+                    من: ${formatCustomDate(log.start)}<br>إلى: ${formatCustomDate(log.end)}
+                </div>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    // تحديث العداد الفعلي الجاري كل ثانية
+    setInterval(updateLiveChrono, 1000);
+
+    // الرندرة والتحضير الأولي عند تشغيل الموقع
+    renderSidebar();
 </script>
-
 </body>
 </html>
